@@ -40,8 +40,7 @@ fn main() {
             Arg::new("encode-set")
                 .short('e')
                 .long("encode-set")
-                .takes_value(true)
-                .possible_values(&[
+                .value_parser([
                     "control",
                     "fragment",
                     "query",
@@ -50,8 +49,9 @@ fn main() {
                     "userinfo",
                     "component",
                     "form",
+                    "all",
                 ])
-                .default_value("component")
+                .default_value("all")
                 .help("The encode set to use when encoding.")
                 .long_help(
                     "The encode set to use when encoding. See \
@@ -75,8 +75,8 @@ fn run(arg_matches: &ArgMatches) -> Result<(), Box<dyn Error + Send + Sync>> {
     let mut stdin_handle = stdin.lock();
     let encode_set = get_encode_set(arg_matches);
 
-    if arg_matches.is_present("INPUT") {
-        let input = arg_matches.value_of("INPUT").unwrap();
+    if arg_matches.contains_id("INPUT") {
+        let input = arg_matches.get_one::<String>("INPUT").unwrap();
         return transform_line(input, &mut stdout_handle, encode_set, arg_matches);
     }
 
@@ -91,7 +91,7 @@ fn run(arg_matches: &ArgMatches) -> Result<(), Box<dyn Error + Send + Sync>> {
 }
 
 fn get_encode_set(args: &ArgMatches) -> &'static AsciiSet {
-    match args.value_of("encode-set").unwrap() {
+    match args.get_one::<String>("encode-set").unwrap().as_str() {
         "control" => encode_sets::CONTROLS,
         "fragment" => encode_sets::FRAGMENT,
         "query" => encode_sets::QUERY,
@@ -100,6 +100,7 @@ fn get_encode_set(args: &ArgMatches) -> &'static AsciiSet {
         "userinfo" => encode_sets::USERINFO,
         "component" => encode_sets::COMPONENT,
         "form" => encode_sets::FORM,
+        "all" => encode_sets::ALL,
         _ => panic!("Unknown encode set"),
     }
 }
@@ -110,8 +111,8 @@ fn transform_line<W: io::Write>(
     encode_set: &'static AsciiSet,
     arg_matches: &ArgMatches,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let decode_mode = arg_matches.is_present("decode") || arg_matches.is_present("strict-decode");
-    let lossy = !arg_matches.is_present("strict-decode");
+    let decode_mode = arg_matches.contains_id("decode") || arg_matches.contains_id("strict-decode");
+    let lossy = !arg_matches.contains_id("strict-decode");
 
     if decode_mode {
         decode(line.as_bytes(), output, lossy)

@@ -2,6 +2,7 @@
 
 use percent_encoding::AsciiSet;
 pub use percent_encoding::CONTROLS;
+pub use percent_encoding::NON_ALPHANUMERIC;
 
 pub(crate) const FRAGMENT: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'<').add(b'>').add(b'`');
 pub(crate) const QUERY: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'#').add(b'<').add(b'>');
@@ -18,3 +19,4 @@ pub(crate) const USERINFO: &AsciiSet = &PATH
     .add(b'|');
 pub(crate) const COMPONENT: &AsciiSet = &USERINFO.add(b'$').add(b'&').add(b'+').add(b',');
 pub(crate) const FORM: &AsciiSet = &COMPONENT.add(b'!').add(b'\'').add(b')').add(b'~');
+pub(crate) const ALL: &AsciiSet = NON_ALPHANUMERIC;
