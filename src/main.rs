@@ -4,7 +4,7 @@ use std::io;
 use std::io::BufRead;
 use std::iter;
 
-use clap::{Arg, ArgMatches, Command};
+use clap::{Arg, ArgAction, ArgMatches, Command};
 use pe::AsciiSet;
 use percent_encoding as pe;
 
@@ -25,12 +25,14 @@ fn main() {
             Arg::new("decode")
                 .short('d')
                 .long("decode")
+                .action(ArgAction::SetTrue)
                 .help("Decode the input, rather than encode."),
         )
         .arg(
             Arg::new("strict-decode")
                 .short('s')
                 .long("strict-decode")
+                .action(ArgAction::SetTrue)
                 .help(
                     "Decode the input non-lossily. If set, the program will fail if it \
                      encounters a sequence that does not produce valid UTF-8.",
